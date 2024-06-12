@@ -66,7 +66,7 @@ class TrieNode {
   std::map<char, std::shared_ptr<const TrieNode>> children_;
 
   // Indicates if the node is the terminal node.
-  bool is_value_node_{false};
+  bool is_value_node_{false}; 
 
   // You can add additional fields and methods here except storing children. But in general, you don't need to add extra
   // fields to complete this project.
