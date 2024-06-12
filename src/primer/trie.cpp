@@ -68,20 +68,20 @@ auto Trie::Put(std::string_view key, T value) const -> Trie {
     }
     return Trie(std::move(new_root));
   }  
-  std::shared)ptr<TrieNode> new_root = nullptr;
+  std::shared_ptr<TrieNode> new_root = nullptr;
   if(root_==nullptr){
     new_root = std::make_unique<TrieNode>();
   }else{
     new_root = root_->Clone();
   }
-  PutCycle<T(new_root, key, std::move(value));
+  PutCycle<T>(new_root, key, std::move(value));
   return Trie(std::move(new_root));
   // You should walk through the trie and create new nodes if necessary. If the node corresponding to the key already
   // exists, you should create a new `TrieNodeWithValue`.
 }
 
-bool RemoveCycle(const std::shared_ptr<TrieNode> & new_roottry, std::string_view key){
-  for(auto & pair:new_roottry->children){
+auto RemoveCycle(const std::shared_ptr<TrieNode> & new_roottry, std::string_view key) -> bool{
+  for(auto & pair:new_roottry->children_){
     if(key.at(0)!=pair.first){
       continue;
     }
@@ -90,15 +90,15 @@ bool RemoveCycle(const std::shared_ptr<TrieNode> & new_roottry, std::string_view
         return false;
       }
       if(pair.second->children_.empty()){
-        new_roottry_children_.erase(pair.first);
+        new_roottry->children_.erase(pair.first);
       }else{
-        pair.second = std::make_shared(const TrieNode)(pair.second->children_);
+        pair.second = std::make_shared<const TrieNode>(pair.second->children_);
       }
       return true;
     }
     std::shared_ptr<TrieNode> ptr = pair.second->Clone();
     bool flag = RemoveCycle(ptr, key.substr(1,key.size()-1));
-    if(!flag) return false;
+    if(!flag) {return false;}
     if(ptr->children_.empty() && !ptr->is_value_node_){
       new_roottry->children_.erase(pair.first);
     }else{
@@ -110,7 +110,7 @@ bool RemoveCycle(const std::shared_ptr<TrieNode> & new_roottry, std::string_view
 }
 
 auto Trie::Remove(std::string_view key) const -> Trie {
-  if(this->root_ == nullptr)  return *this;
+  if(this->root_ == nullptr)  {return *this;}
   if(key.empty()){
     if(root_->is_value_node_){
       if(root_->children_.empty()){
@@ -123,7 +123,7 @@ auto Trie::Remove(std::string_view key) const -> Trie {
   }
   std::shared_ptr<TrieNode> newroot = root_->Clone();
   bool flag = RemoveCycle(newroot, key);
-  if(!flag) return *this;
+  if(!flag) {return *this;}
   if(newroot->children_.empty()&& !newroot->is_value_node_){
     newroot=nullptr;
   }
