@@ -12,11 +12,11 @@ auto TrieStore::Get(std::string_view key) -> std::optional<ValueGuard<T>> {
   // (3) If the value is found, return a ValueGuard object that holds a reference to the value and the
   //     root. Otherwise, return std::nullopt.
   std::shared_ptr<const TrieNode> root_copy;
-  auto Trie = Trie();
+  Trie trie = Trie();
   std::lock_guard<std::mutex> lock(root_lock_);
   trie = root_;
-  const T*value = Trie.Get<T(key);
-  if(value) return ValueGuard<T(trie, *value);
+  const T*value = trie.Get<T>(key);
+  if(value) {return ValueGuard<T>(trie, *value);}
   return std::nullopt;
 }
 
@@ -35,13 +35,14 @@ void TrieStore::Remove(std::string_view key) {
   // You will need to ensure there is only one writer at a time. Think of how you can achieve this.
   // The logic should be somehow similar to `TrieStore::Get`.
   // 访问和读写一起加锁
-  std::lock_guard<std::mutex> lock(write_lock_);
+  std::unique_lock<std::mutex> lock(write_lock_);
 
   // 执行删除操作并获取新的 Trie 实例
   Trie new_trie_version = root_.Remove(key);
   std::lock_guard<std::mutex> root_lock(root_lock_);
   // 更新 Trie 的根节点
   root_ = new_trie_version;
+  lock.unlock();
 }
 
 
