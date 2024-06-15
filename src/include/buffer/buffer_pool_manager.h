@@ -136,7 +136,7 @@ class BufferPoolManager {
    * @param access_type type of access to the page, only needed for leaderboard tests.
    * @return false if the page is not in the page table or its pin count is <= 0 before this call, true otherwise
    */
-  auto UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unused]] AccessType access_type) -> bool;
+  auto UnpinPage(page_id_t page_id, bool is_dirty) -> bool;
 
   /**
    * TODO(P1): Add implementation

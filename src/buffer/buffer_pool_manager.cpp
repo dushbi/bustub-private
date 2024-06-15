@@ -113,7 +113,7 @@ auto BufferPoolManager::FetchPage(page_id_t page_id) -> Page * {
   return page;
 }
 
-auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unused]] AccessType access_type) -> bool {
+auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) -> bool {
   if(page_id == INVALID_PAGE_ID){return false;}
   std::scoped_lock lock(latch_);
   if(page_table_.find(page_id)==page_table_.end()){return false;}
