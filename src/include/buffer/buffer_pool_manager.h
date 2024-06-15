@@ -103,7 +103,7 @@ class BufferPoolManager {
    * @param access_type type of access to the page, only needed for leaderboard tests.
    * @return nullptr if page_id cannot be fetched, otherwise pointer to the requested page
    */
-  auto FetchPage(page_id_t page_id, AccessType access_type = AccessType::Unknown) -> Page *;
+  auto FetchPage(page_id_t page_id) -> Page *;
 
   /**
    * TODO(P1): Add implementation
@@ -136,7 +136,7 @@ class BufferPoolManager {
    * @param access_type type of access to the page, only needed for leaderboard tests.
    * @return false if the page is not in the page table or its pin count is <= 0 before this call, true otherwise
    */
-  auto UnpinPage(page_id_t page_id, bool is_dirty, AccessType access_type = AccessType::Unknown) -> bool;
+  auto UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unused]] AccessType access_type) -> bool;
 
   /**
    * TODO(P1): Add implementation
@@ -182,11 +182,11 @@ class BufferPoolManager {
   /** Array of buffer pool pages. */
   Page *pages_;
   /** Pointer to the disk sheduler. */
-  std::unique_ptr<DiskScheduler> disk_scheduler_ __attribute__((__unused__));
+  std::unique_ptr<DiskScheduler> disk_scheduler_ ;
   /** Pointer to the log manager. Please ignore this for P1. */
-  LogManager *log_manager_ __attribute__((__unused__));
+  LogManager *log_manager_ ;
   /** Page table for keeping track of buffer pool pages. */
-  std::unordered_map<page_id_t, frame_id_t> page_table_;
+  std::unordered_map<page_id_t, frame_id_t> page_table_;   
   /** Replacer to find unpinned pages for replacement. */
   std::unique_ptr<LRUKReplacer> replacer_;
   /** List of free frames that don't have any pages on them. */
@@ -194,7 +194,7 @@ class BufferPoolManager {
   /** This latch protects shared data structures. We recommend updating this comment to describe what it protects. */
   std::mutex latch_;
   /** This buffer is for the leaderboard task. You may want to use it to optimize the write requests. */
-  WriteBackCache write_back_cache_ __attribute__((__unused__));
+  WriteBackCache write_back_cache_ ;
 
   /**
    * @brief Allocate a page on disk. Caller should acquire the latch before calling this function.

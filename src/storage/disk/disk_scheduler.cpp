@@ -31,26 +31,20 @@ DiskScheduler::~DiskScheduler() {
 
 void DiskScheduler::Schedule(DiskRequest r) {
   // 创建 promise 并获取对应的 future
-  request_queue_.Put(std::make_optional(std::move(r)));
+  request_queue_.Put(std::make_optional<DiskRequest>(std::move(r)));
 }
 
 void DiskScheduler::StartWorkerThread() {
-  while (true) {
-    auto request_opt = request_queue_.Get();
-    // 检查是否应该停止线程
-    if (!request_opt.has_value()) {
-      break;
-    }
-    // 处理磁盘请求
-    DiskRequest &request = request_opt.value();
-    if (request.is_write_) {
-      disk_manager_->WritePage(request.page_id_, request.data_);
+    std::optional<DiskRequest> request;
+    while((request=request_queue_.Get(),request.has_value())){
+    if (request->is_write_) {
+      disk_manager_->WritePage(request->page_id_, request->data_);
     } else {
-      disk_manager_->ReadPage(request.page_id_, request.data_);
+      disk_manager_->ReadPage(request->page_id_, request->data_);
     }
 
     // 设置回调标志
-    request.callback_.set_value(true);
+    request->callback_.set_value(true);
   }
 }
 
